@@ -50,16 +50,6 @@ const tempWatchedData = [
 const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 
-function MovieSearchedBox({ movies }) {
-  const [isOpen1, setIsOpen1] = useState(true);
-
-  return (
-    <div className="box">
-      <OpenCloseButton onClick={setIsOpen1} isOpen={isOpen1} />
-      {isOpen1 && <ListOfSearchedMovie movies={movies} />}
-    </div>
-  );
-}
 function OpenCloseButton({ onClick, isOpen }) {
   return (
     <button className="btn-toggle" onClick={() => onClick((open) => !open)}>
@@ -67,22 +57,18 @@ function OpenCloseButton({ onClick, isOpen }) {
     </button>
   );
 }
-function MovieWatchedBox() {
-  const [watched, setWatched] = useState(tempWatchedData);
-  const [isOpen2, setIsOpen2] = useState(true);
-
+function Box({ children }) {
+  const [isOpen, setIsOpen] = useState(true);
   return (
     <div className="box">
-      <OpenCloseButton isOpen={isOpen2} onClick={setIsOpen2} />
-      {isOpen2 && (
-        <>
-          <WatchedSummary watched={watched} />
-          <ListOfWatchedMovies watched={watched} />
-        </>
-      )}
+      <button className="btn-toggle" onClick={() => setIsOpen((open) => !open)}>
+        {isOpen ? "–" : "+"}
+      </button>
+      {isOpen && children}
     </div>
   );
 }
+
 function ListOfWatchedMovies({ watched }) {
   return (
     <ul className="list">
@@ -166,33 +152,39 @@ function Movie({ movie }) {
     </li>
   );
 }
-function Main({ movies }) {
-  return (
-    <main className="main">
-      <MovieSearchedBox movies={movies} />
-      <MovieWatchedBox />
-    </main>
-  );
+function Main({ children }) {
+  return <main className="main">{children}</main>;
 }
 export default function App() {
   const [movies, setMovies] = useState(tempMovieData);
-
+  const [watched, setWatched] = useState(tempWatchedData);
   return (
     <>
       {/* Nav bar */}
-      <NavBar movies={movies} />
+      <NavBar>
+        <NumResult movies={movies} />
+      </NavBar>
       {/* End Nav bar */}
-      <Main movies={movies} />
+      <Main>
+        <Box>
+          <ListOfSearchedMovie movies={movies} />
+        </Box>
+
+        <Box>
+          <WatchedSummary watched={watched} />
+          <ListOfWatchedMovies watched={watched} />
+        </Box>
+      </Main>
     </>
   );
 }
 
-function NavBar({ movies }) {
+function NavBar({ children }) {
   return (
     <nav className="nav-bar">
       <Logo />
       <SearchBar />
-      <NumResult movies={movies} />
+      {children}
     </nav>
   );
 }
